@@ -1,9 +1,9 @@
 import time
 import numpy as np
-from pyJSMF.inference import findS
-from pyJSMF.inference import recoverB
-from pyJSMF.inference import recoverA
-from pyJSMF.rectification import rectifyC
+from inference import findS
+from inference import recoverB
+from inference import recoverA
+from rectification import rectifyC
 
 ##
 # Main: factorizeC()

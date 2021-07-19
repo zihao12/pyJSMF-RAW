@@ -3,7 +3,7 @@ import numpy as np
 import sys
 from scipy import linalg as la
 from scipy.sparse import linalg as spla
-from pyJSMF.optimization import solveSCLS_expGrad, solveSCLS_admmDR, solveSCLS_activeSet, projectToSimplex
+from optimization import solveSCLS_expGrad, solveSCLS_admmDR, solveSCLS_activeSet, projectToSimplex
 
 ##
 # Main: findS()

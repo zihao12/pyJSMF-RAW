@@ -1,6 +1,7 @@
 import time
 import numpy as np
 from scipy import sparse
+import pdb
 
 ##
 # Main: bows2C()
@@ -192,13 +193,15 @@ def readBows(bows_filename, dict_filename, stop_filename, N, min_objects, output
 	# Print out initial status
 	print('[file.readBows] Start reading Bag-of-words dataset...')
 	startTime = time.time()
-
+	#pdb.set_trace()
 	# Open the input file and read the statistics in the header
 	bowsFile = open(bows_filename, 'r')
 	inputLine = bowsFile.readline()
-	M = int(inputLine)
+	# M = int(inputLine)
+	M = [int(i) for i in inputLine.strip('\n').split()]
 	inputLine = bowsFile.readline()
-	V = int(inputLine)
+	#V = int(inputLine)
+	V = [int(i) for i in inputLine.strip('\n').split()]
 	bowsFile.readline()
 
 	# Step 0: Read the Bag-of-words(objects) content
