@@ -21,3 +21,16 @@ match_topics <- function(F1, F2, use_top = NULL){
   }
   return(id)
 }
+
+# Simulate counts from the multinomial topic model with factors F,
+# loadings L and sample sizes s.
+simulate_multinom_counts <- function (L, F, s) {
+  n <- nrow(L)
+  m <- nrow(F)
+  X <- matrix(0,n,m)
+  P <- tcrossprod(L,F)
+  for (i in 1:n)
+    X[i,] <- rmultinom(1,s[i],P[i,])
+  return(X)
+}
+
