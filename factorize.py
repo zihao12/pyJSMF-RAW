@@ -4,7 +4,7 @@ from inference import findS
 from inference import recoverB
 from inference import recoverA
 from rectification import rectifyC
-
+import pdb
 ##
 # Main: factorizeC()
 #
@@ -42,6 +42,7 @@ def factorizeC(C, K, rectifier='AP', optimizer='activeSet'):
 
 	# Perform row-normalization for the (rectified) co-occurrence matrix C.
 	C_rowSums = C.sum(axis=1)
+	# pdb.set_trace()
 	Cbar = C/C_rowSums[:,None]
 
 	# Step 1: Find the given number of bases S. 

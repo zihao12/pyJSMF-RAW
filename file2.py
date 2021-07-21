@@ -7,7 +7,7 @@ import pdb
 # Main: bows2C()
 #
 # Inputs:
-#   - bows: X-by-3 bag-of-words matrix
+#   - bows: X-by-3 bag-of-words matrix (need to make sure all words have >= 1 tokens)
 #   - min_tokens: min. number of tokens for effective training examples
 #
 # Outputs:
@@ -42,6 +42,10 @@ def bows2C(bows, min_tokens):
 	D1 = np.zeros(N)
 	D2 = np.zeros((N,N))
 	for m in range(len(endRows)-1):
+		# print(m)
+
+		# if m == 1:
+		# 	pdb.set_trace()
 		# Determine the start and end rows for this document
 		startRow = endRows[m]
 		endRow = endRows[m+1]
@@ -63,14 +67,16 @@ def bows2C(bows, min_tokens):
 		# Accumulate corresponding counts to co-occurrence and example/co-example frequencies.
 		# Note that co-example frequency for an object can exit only when the object occurs more than once.
 		normalizer = numTokens*(numTokens-1)
+
 		C[np.ix_(objects,objects)] += (np.outer(counts,counts) - np.diag(counts)).astype(float)/normalizer
 		D1[objects] += 1
 		D2[np.ix_(objects, objects)] += 1 - np.diag(counts == 1)
 
 	# Ensure the overall sum is equal to 1.0
 	entrySum = C.sum()
-	if (entrySum != M):
-		C /= entrySum
+	# if (entrySum != M):
+	# 	C /= entrySum
+	C /= entrySum
 
 	elapsedTime = time.time() - startTime
 

@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 from scipy import linalg as la
-
+import pdb
 ##
 # Main: solveSCLS_expGrad()
 #

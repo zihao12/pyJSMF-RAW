@@ -5,6 +5,7 @@ from scipy import linalg as la
 from scipy.sparse import linalg as spla
 from optimization import solveSCLS_expGrad, solveSCLS_admmDR, solveSCLS_activeSet, projectToSimplex
 
+import pdb
 ##
 # Main: findS()
 #
