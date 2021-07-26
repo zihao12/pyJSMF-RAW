@@ -60,10 +60,23 @@ S, B, A, _, _, _, _, C = factorizeC(C, K=k, rectifier='AP', optimizer='activeSet
 print("get S0 from Ctrue")
 S0, B0, A0, _, _, _, _, _ = factorizeC(Ctrue, K=k, rectifier='no', optimizer='activeSet')
 
+print("fit using S0")
+# Perform row-normalization for the (rectified) co-occurrence matrix C.
+C_rowSums = C.sum(axis=1)
+# pdb.set_trace()
+Cbar = C/C_rowSums[:,None]
+# Step 2: Recover object-cluster matrix B. (i.e., recovers word-topic matrix)
+print("+ Start recovering the object-cluster B...")
+B2, _, _ = recoverB(Cbar, C_rowSums, S0, 'activeSet')
+# Step 3: Recover cluster-cluster matrix A. (i.e., recovers topic-topic matrix)
+print("+ Start recovering the cluster-cluster A...")
+A2, _ = recoverA(C, B2, S0)
 
 
 out = {'X':X, 'Ftrue':F, 'Ltrue':L, 'Atrue':Atrue, 
-'C':C, 'S':S, 'B':B, 'A':A, 'S0':S0, 'B0':B0, 'A0':A0}
+'C':C, 'S':S, 'B':B, 'A':A, 
+'S0':S0, 'B0':B0, 'A0':A0,
+'B2':B2, 'A2':A2}
 
 file = open(outputfile, 'wb')
 pickle.dump(out, file)
