@@ -1,4 +1,12 @@
 import numpy as np
+import rpy2.robjects as robjects
+
+def read_fitted_rds(filename):
+	readRDS = robjects.r['readRDS']
+	data = readRDS(filename)
+	d = {key: np.asarray(data.rx2(key)) for key in data.names}
+
+	return d
 
 def match_topics(F1, F2):
 	k = F1.shape[1]
