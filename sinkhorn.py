@@ -1,5 +1,7 @@
 ## implement sinkhorn normalization
 import numpy as np
+from sklearn.decomposition import TruncatedSVD
+
 
 def sinkhorn(X, niter = 10):
   r = X.mean(axis = 1)
@@ -22,6 +24,21 @@ def X2C_svd(X, r=50):
 	l = (X.sum(axis = 1) ** 2).mean()
 	C =  vh[:r, :].T @ np.diag(s[:r]**2) @ vh[:r, :] - np.diag(np.repeat(1, p))
 	C /= l
+	C[C < 0] = 1e-16
+	C /= C.sum()
+
+	return C
+
+
+# Inputs:
+# - X: n by p data matrix (possibly normalized)
+# - r: number of eigenvectors to use 
+# Outputs:
+# - C: p by p covariance matrix
+def X2C_svd_large(X, r=50):
+	svd = TruncatedSVD(n_components=r, random_state=42)
+	US = svd.fit_transform(X.T)
+	C = US @ US.T - np.diag(np.repeat(1, X.shape[1]))
 	C[C < 0] = 1e-16
 	C /= C.sum()
 
