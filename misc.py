@@ -1,5 +1,10 @@
 import numpy as np
 import rpy2.robjects as robjects
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+
+
+
 
 def read_fitted_rds(filename):
 	readRDS = robjects.r['readRDS']
@@ -22,3 +27,30 @@ def match_topics(F1, F2):
 		ind[j1] = matched
 
 	return ind
+
+
+
+
+## visualize the extremal rows of matrix X (intended for when X is a lower dimension embedding)
+def vis_extremal_pca(X, S, which_dim = [0, 1]):
+	mask = np.zeros(X.shape[0])
+	mask[S] = 1
+	mask = mask.astype(bool)
+
+	fig = plt.figure()
+	ax1 = fig.add_subplot(111)
+	ax1.scatter(X[np.invert(mask),which_dim[0]], 
+	            X[np.invert(mask), which_dim[1]], 
+	            s = 3, c='b', marker="+", label='first')
+	ax1.scatter(X[mask,which_dim[0]], 
+	            X[mask, which_dim[1]], 
+	            s=30, c='r', marker="o", label='second')
+	# plt.legend(loc='upper left');
+	plt.show()
+
+def Cbar_proj(C):
+	C = C/C.sum(axis=1)[:,None]
+	pca = PCA(n_components=10)
+	pca.fit(C)
+	
+	return pca.transform(C)

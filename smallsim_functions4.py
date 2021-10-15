@@ -27,14 +27,17 @@ def simulate_multinomial_counts(L, F, s):
 
     return X
 
-def smallsim_independent(n = 100, p = 400, k = 6, doc_len = 50):
+def smallsim_independent(n = 100, p = 400, k = 6, doc_len = 50, n_top = 20, returnL = False):
     s = np.repeat(doc_len, n)
     S = 13 * np.diag(np.repeat(1, k)) - 2
-    F, p0 = simulate_factors(p, k)
+    F, p0 = simulate_factors(p, k, n_top)
     L = simulate_loadings(n, k, S)
     X = simulate_multinomial_counts(L, F, s)
 
     A = (L.T @ L) / n
+
+    if returnL:
+        return X, A, F, p0, L        
 
     return X, A, F, p0
 

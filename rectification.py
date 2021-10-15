@@ -68,8 +68,8 @@ def rectifyC_AP(C, K, T=15):
 		values[0, t] = la.norm(C_NN - C_prev, 'fro')
 		values[1, t] = (d_PSD**2+d_JS**2+d_NN**2)/6
 
-		if t%1 == 0:
-			print('  - %d-th iteration... (%e / %e)' % (t+1,values[0,t],values[1,t]))
+		# if t%1 == 0:
+		# 	print('  - %d-th iteration... (%e / %e)' % (t+1,values[0,t],values[1,t]))
 
 
 	C = C_NN/sum(sum(C_NN))
