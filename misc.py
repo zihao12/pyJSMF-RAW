@@ -55,6 +55,37 @@ def vis_extremal_pca(X, S, which_dim = [0, 1], annotate=False,fontsize=6):
 	# plt.legend(loc='upper left');
 	plt.show()
 
+def vis_extremal2(X, S0, S, which_dim = [0, 1], annotate=False,fontsize=6):
+	mask0 = np.zeros(X.shape[0])
+	mask0[S0] = 1
+	mask0 = mask0.astype(bool)
+
+	mask = np.zeros(X.shape[0])
+	mask[S] = 1
+	mask = mask.astype(bool)
+
+	fig = plt.figure()
+	ax1 = fig.add_subplot(111)
+	ax1.scatter(X[:,which_dim[0]], 
+	            X[:, which_dim[1]], 
+	            s = 3, c='b', marker="+", label='first')
+	ax1.scatter(X[mask,which_dim[0]], 
+	            X[mask, which_dim[1]], 
+	            s=30, c='r', marker="o", label='second')
+	ax1.scatter(X[mask0,which_dim[0]], 
+	            X[mask0, which_dim[1]], 
+	            s=30, c='green', marker="o", label='third')
+	if annotate:
+		for s in S:
+			ax1.annotate(s, (X[s,which_dim[0]], X[s,which_dim[1]]), 
+				fontsize = fontsize, rotation=45)
+		for s in S0:
+			ax1.annotate(s, (X[s,which_dim[0]], X[s,which_dim[1]]), 
+				fontsize = fontsize, rotation=45)
+
+	# plt.legend(loc='upper left');
+	plt.show()
+
 
 
 def Cbar_proj(C):
