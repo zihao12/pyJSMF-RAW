@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from scipy.stats import betabinom
 from scipy.optimize import minimize
-
+from mpl_toolkits import mplot3d
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 
 
@@ -84,6 +85,33 @@ def vis_extremal2(X, S0, S, which_dim = [0, 1], annotate=False,fontsize=6):
 				fontsize = fontsize, rotation=45)
 
 	# plt.legend(loc='upper left');
+	plt.show()
+
+def vis_extremal_3d(coords, S):
+	extremal = np.append(np.zeros((1, coords.shape[1])), coords[S,:], axis = 0)
+
+	x, y, z = extremal[:,0],extremal[:,1], extremal[:,2]
+	vertices = [[0, 1, 2], [0, 1, 3], [0, 2, 3], [1, 2, 3]]
+
+	tupleList = list(zip(x, y, z))
+	poly3d = [[tupleList[vertices[ix][iy]] for iy in range(len(vertices[0]))] for ix in range(len(vertices))]
+
+	fig = plt.figure()
+	ax = fig.add_subplot(111, projection='3d')
+	ax.scatter(x,y,z, color = "red", s = 50)
+	ax.add_collection3d(Poly3DCollection(poly3d, facecolors='w', linewidths=1, alpha=0.5))
+
+	x2 = coords[:, 0]
+	y2 = coords[:, 1]
+	z2 = coords[:, 2]
+	ax.scatter(x2, y2, z2, s = 5, 
+	        cmap='viridis', linewidth=0.5);
+	# ax.set_xlim(x2.min(),x2.max())
+	# ax.set_ylim(y2.min(),y2.max())
+	# ax.set_zlim(z2.min(),z2.max())
+
+	ax.text(0, 0, 0, "0", fontsize = 20)
+
 	plt.show()
 
 
