@@ -13078,7 +13078,7 @@ div#notebook {
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Identified-issues">Identified issues<a class="anchor-link" href="#Identified-issues">&#182;</a></h2><ul>
-<li><p>From <a href="https://github.com/zihao12/pyJSMF-RAW/blob/master/experiments/issues_finding_anchor_word.ipynb">previous experiment</a> we can see why "recoverS" step (finding anchor words) fails: by scaling $C$ to have row sum $1$, we amplify the error of less frequent words; as a result, some less frequent words would appear at the extremal after scaling due to noise, so our "recoverS" step selects them instead.</p>
+<li><p>From <a href="https://zihao12.github.io/pyJSMF-RAW/issues_finding_anchor_word">previous experiment</a> we can see why "recoverS" step (finding anchor words) fails: by scaling $C$ to have row sum $1$, we amplify the error of less frequent words; as a result, some less frequent words would appear at the extremal after scaling due to noise, so our "recoverS" step selects them instead.</p>
 </li>
 <li><p>Requiring input of "recoverS" to have rowsums to be $1$'s (as in <a href="https://arxiv.org/abs/1212.4777">A Practical Algorithm for Topic Modeling with Provable Guarantees</a>) is not a necessary condition for the "recoverS" step (which is modified Gram-Schimdt with row pivoting) to work. In fact we can relax its assumptions:</p>
 </li>
