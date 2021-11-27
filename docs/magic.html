@@ -13078,8 +13078,22 @@ div#notebook {
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Goal:">Goal:<a class="anchor-link" href="#Goal:">&#182;</a></h2><p><a href="https://www.cell.com/action/showPdf?pii=S0092-8674%2818%2930724-4">MAGIC</a> provides a cool &amp; fast way of denoising data, especially for rare words/genes, by borrowing information across cells. It may help my task (<a href="https://zihao12.github.io/pyJSMF-RAW/issues_finding_anchor_word">challenge</a>) here, in two ways below:</p>
+<h2 id="Notation">Notation<a class="anchor-link" href="#Notation">&#182;</a></h2><ul>
+<li>$X_{ij}$ gene $j$ in cell $i$</li>
+<li>$Y = X^T$ so $Y_{ij}$ gene $i$ in cell $j$</li>
+</ul>
 <h3 id="Apply-MAGIC-TO-$X$">Apply MAGIC TO $X$<a class="anchor-link" href="#Apply-MAGIC-TO-$X$">&#182;</a></h3><p>Denoising, particularly for rare genes. Hope is by borrowing info from similar cells, we can get better vector for rare genes</p>
-<h3 id="Apply-MAGIC-to-$X^T$">Apply MAGIC to $X^T$<a class="anchor-link" href="#Apply-MAGIC-to-$X^T$">&#182;</a></h3><p>Not standard usage. We hope to achieve shrinkage. We form a similarity measure between genes, and use this to form a transition matrix, then multiply to  shrink the original matrix (though it seems the transition matrix ia what we want)</p>
+<h3 id="Apply-MAGIC-to-$Y-=-X^T$">Apply MAGIC to $Y = X^T$<a class="anchor-link" href="#Apply-MAGIC-to-$Y-=-X^T$">&#182;</a></h3><p>Not standard usage. We hope to achieve shrinkage. We form a similarity measure between genes, and use this to form a transition matrix, then multiply to  shrink the original matrix (though it seems the transition matrix ia what we want)</p>
+<h3 id="Why-MAGIC-to-$Y-=-X^T$-works?">Why MAGIC to $Y = X^T$ works?<a class="anchor-link" href="#Why-MAGIC-to-$Y-=-X^T$-works?">&#182;</a></h3><ul>
+<li><p>First we construct affinity matrix $D$ for genes, then scale it into transition matrix $M$, then get imputed matrix $Y^{\text{impute}} = M^t Y$ or $Y^{\text{impute}}_{ij} = \sum_k (M^t)_{ik} Y_{kj}$: imputation for gene $i$ in cell $j$ is weighted average of genes in that same cell; the weights are the transition probability from gene $i$ to gene $k$ in $t$ steps.</p>
+</li>
+<li><p>The vector for rarer genes are shorter and have wider-ranging angles (more likely to appear extreme). However, our affinity matrix will group those shorter vectors as neighbors, and imputation becomes averaging over those shorter vectors, effectively shrinking them towards the center.</p>
+</li>
+<li><p>Problem is noise may lead to bad affinity matrix, and thus leads to over-shrinkage. For example, a true anchor word is also rather rare, then affinity matrix will decide its neighbors are those short and noisy vectors. Then imputation on this anchor word will smooth out true information.</p>
+</li>
+<li><p>Power parameter $t$ plays a big role here; also the strategy for choosing adaptive gaussian kernel width (in forming affinity matrix) for each gene might be tweaked.</p>
+</li>
+</ul>
 
 </div>
 </div>
