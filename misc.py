@@ -7,8 +7,29 @@ from scipy.optimize import minimize
 from mpl_toolkits import mplot3d
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
+def poisson2multinom(F, L):
+    u = F.sum(axis = 0)
+    F /= u
+    L *= u
+    L /= L.sum(axis = 1)[:, None]
+    
+    return F, L
 
 
+def is_anchor_word(f, ind, cutoff):
+    return (f[np.invert(ind)].max() == 0) and (f[ind] > cutoff)
+    
+def find_anchor_word_k(F, k):
+    F_ = F.copy()
+    p, K = F_.shape
+    cutoff0 = (1/ p) / 1000
+    F_[F_ < cutoff0] = 0
+    cutoff1 = (1/ p) / 10
+    
+    ind = np.zeros( K, bool)
+    ind[k] = True
+    
+    return np.apply_along_axis(func1d = is_anchor_word, axis = 1, arr = F_, ind = ind, cutoff = cutoff1)
 
 def read_fitted_rds(filename):
 	readRDS = robjects.r['readRDS']
@@ -111,6 +132,22 @@ def vis_extremal_3d(coords, S):
 	# ax.set_zlim(z2.min(),z2.max())
 
 	ax.text(0, 0, 0, "0", fontsize = 20)
+
+	plt.show()
+
+def vis_3d(coords):
+	fig = plt.figure()
+	ax = fig.add_subplot(111, projection='3d')
+	
+	x2 = coords[:, 0]
+	y2 = coords[:, 1]
+	z2 = coords[:, 2]
+	ax.scatter(x2, y2, z2, s = 5, 
+	        cmap='viridis', linewidth=0.5);
+	# ax.set_xlim(x2.min(),x2.max())
+	# ax.set_ylim(y2.min(),y2.max())
+	# ax.set_zlim(z2.min(),z2.max())
+
 
 	plt.show()
 
