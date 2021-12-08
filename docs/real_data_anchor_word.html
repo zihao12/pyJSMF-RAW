@@ -13082,7 +13082,7 @@ div#notebook {
 </li>
 <li><p>I use the datasets from <a href="https://stephenslab.github.io/fastTopics-experiments/">fastTopics-experiments</a> and <a href="https://zihao12.github.io/ebpmf_data_analysis/data_preprocessing_sla">SLA</a> . I look at fits using different number of topics. I examine SLA and NIPS dataset more closely.</p>
 </li>
-<li><p>I find that text datasets with a moderate number of topis satisfy the anchor word assumptions (sometimes a lot of anchor words!). But for pbmc68 a couple topics don't have exact anchor words; more so in droplet data.</p>
+<li><p>I define word $j$ a <strong>anchor word</strong> for topic $k$ if $f_{jk} &gt; 10 \sum_{l \neq k} f_{jl}$. Here $F, L$ are transformed into multinomial model so $\sum_j f_{jk} = 1$</p>
 </li>
 </ul>
 
@@ -13139,7 +13139,7 @@ div#notebook {
 <span class="k">del</span> <span class="n">data</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k2</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;topic </span><span class="si">{i}</span><span class="s2">: </span><span class="si">{n_anchor}</span><span class="s2"> anchor words&quot;</span><span class="p">)</span>
 
 <span class="n">vocab</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">vocabfile</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="s2">&quot;str&quot;</span><span class="p">)</span>
@@ -13160,12 +13160,12 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>topic 0: 565 anchor words
-topic 1: 429 anchor words
-topic 2: 287 anchor words
-topic 3: 468 anchor words
-topic 4: 838 anchor words
-topic 5: 803 anchor words
+<pre>topic 0: 598 anchor words
+topic 1: 455 anchor words
+topic 2: 311 anchor words
+topic 3: 499 anchor words
+topic 4: 877 anchor words
+topic 5: 859 anchor words
 </pre>
 </div>
 </div>
@@ -13505,7 +13505,7 @@ top samples&#39; titles
 <span class="n">F</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">poisson2multinom</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k2</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;topic </span><span class="si">{i}</span><span class="s2">: </span><span class="si">{n_anchor}</span><span class="s2"> anchor words&quot;</span><span class="p">)</span>
 
 <span class="n">n</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">shape</span>
@@ -13544,14 +13544,14 @@ top samples&#39; titles
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>topic 0: 641 anchor words
-topic 1: 369 anchor words
-topic 2: 463 anchor words
-topic 3: 389 anchor words
+<pre>topic 0: 990 anchor words
+topic 1: 503 anchor words
+topic 2: 646 anchor words
+topic 3: 609 anchor words
 [inference.findS] Start finding the set of anchor bases S...
 + Finish finding set S!
   - Discovered 4 basis vectors by [sparsePartial] method.
-  - Elapsed time = 2.3398 seconds
+  - Elapsed time = 8.3012 seconds
 
 F[anchor_words,:]
 [[0.       0.       0.       0.000495]
@@ -13614,7 +13614,7 @@ F[anchor_words,:]
 <span class="n">F</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">poisson2multinom</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k2</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;topic </span><span class="si">{i}</span><span class="s2">: </span><span class="si">{n_anchor}</span><span class="s2"> anchor words&quot;</span><span class="p">)</span>
 
 <span class="n">n</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">shape</span>
@@ -13654,16 +13654,16 @@ F[anchor_words,:]
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>topic 0: 44 anchor words
-topic 1: 150 anchor words
-topic 2: 515 anchor words
-topic 3: 62 anchor words
-topic 4: 273 anchor words
-topic 5: 233 anchor words
+<pre>topic 0: 91 anchor words
+topic 1: 288 anchor words
+topic 2: 738 anchor words
+topic 3: 84 anchor words
+topic 4: 362 anchor words
+topic 5: 359 anchor words
 [inference.findS] Start finding the set of anchor bases S...
 + Finish finding set S!
   - Discovered 6 basis vectors by [sparsePartial] method.
-  - Elapsed time = 4.1814 seconds
+  - Elapsed time = 6.5691 seconds
 
 F[anchor_words,:]
 [[0.       0.000297 0.       0.       0.       0.      ]
@@ -13743,7 +13743,7 @@ F[anchor_words,:]
 <span class="n">F</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">poisson2multinom</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k2</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;topic </span><span class="si">{i}</span><span class="s2">: </span><span class="si">{n_anchor}</span><span class="s2"> anchor words&quot;</span><span class="p">)</span>
 
 <span class="n">n</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">shape</span>
@@ -13785,20 +13785,20 @@ F[anchor_words,:]
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>topic 0: 14 anchor words
-topic 1: 5 anchor words
-topic 2: 336 anchor words
-topic 3: 64 anchor words
-topic 4: 14 anchor words
-topic 5: 154 anchor words
-topic 6: 94 anchor words
-topic 7: 109 anchor words
-topic 8: 82 anchor words
-topic 9: 11 anchor words
+<pre>topic 0: 31 anchor words
+topic 1: 13 anchor words
+topic 2: 460 anchor words
+topic 3: 153 anchor words
+topic 4: 15 anchor words
+topic 5: 201 anchor words
+topic 6: 181 anchor words
+topic 7: 202 anchor words
+topic 8: 138 anchor words
+topic 9: 14 anchor words
 [inference.findS] Start finding the set of anchor bases S...
 + Finish finding set S!
   - Discovered 10 basis vectors by [sparsePartial] method.
-  - Elapsed time = 7.1348 seconds
+  - Elapsed time = 10.5524 seconds
 
 F[anchor_words,:]
 [[0.     0.     0.     0.     0.     0.     0.     0.     0.0003 0.    ]
@@ -13921,7 +13921,7 @@ F[anchor_words,:]
 <span class="n">F</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">poisson2multinom</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k2</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;topic </span><span class="si">{i}</span><span class="s2">: </span><span class="si">{n_anchor}</span><span class="s2"> anchor words&quot;</span><span class="p">)</span>
     
 </pre></div>
@@ -13940,10 +13940,10 @@ F[anchor_words,:]
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>topic 0: 8114 anchor words
-topic 1: 3489 anchor words
-topic 2: 5716 anchor words
-topic 3: 8328 anchor words
+<pre>topic 0: 8642 anchor words
+topic 1: 7038 anchor words
+topic 2: 6356 anchor words
+topic 3: 9035 anchor words
 </pre>
 </div>
 </div>
@@ -13972,7 +13972,7 @@ topic 3: 8328 anchor words
 <span class="n">F</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">poisson2multinom</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k2</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;topic </span><span class="si">{i}</span><span class="s2">: </span><span class="si">{n_anchor}</span><span class="s2"> anchor words&quot;</span><span class="p">)</span>
     
 </pre></div>
@@ -13991,16 +13991,16 @@ topic 3: 8328 anchor words
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>topic 0: 25 anchor words
-topic 1: 1767 anchor words
-topic 2: 2738 anchor words
-topic 3: 2630 anchor words
-topic 4: 2022 anchor words
-topic 5: 3361 anchor words
-topic 6: 2360 anchor words
-topic 7: 3254 anchor words
-topic 8: 2763 anchor words
-topic 9: 2649 anchor words
+<pre>topic 0: 56 anchor words
+topic 1: 1899 anchor words
+topic 2: 2866 anchor words
+topic 3: 2845 anchor words
+topic 4: 2250 anchor words
+topic 5: 3548 anchor words
+topic 6: 2651 anchor words
+topic 7: 3644 anchor words
+topic 8: 3018 anchor words
+topic 9: 2794 anchor words
 </pre>
 </div>
 </div>
@@ -14029,7 +14029,7 @@ topic 9: 2649 anchor words
 <span class="n">F</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">poisson2multinom</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k2</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;topic </span><span class="si">{i}</span><span class="s2">: </span><span class="si">{n_anchor}</span><span class="s2"> anchor words&quot;</span><span class="p">)</span>
     
 </pre></div>
@@ -14048,18 +14048,18 @@ topic 9: 2649 anchor words
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>topic 0: 2301 anchor words
-topic 1: 1029 anchor words
-topic 2: 2734 anchor words
-topic 3: 4 anchor words
-topic 4: 2372 anchor words
-topic 5: 1915 anchor words
-topic 6: 1669 anchor words
-topic 7: 1447 anchor words
-topic 8: 1997 anchor words
-topic 9: 2591 anchor words
-topic 10: 2389 anchor words
-topic 11: 2381 anchor words
+<pre>topic 0: 2410 anchor words
+topic 1: 1116 anchor words
+topic 2: 2967 anchor words
+topic 3: 17 anchor words
+topic 4: 2531 anchor words
+topic 5: 2051 anchor words
+topic 6: 1872 anchor words
+topic 7: 1599 anchor words
+topic 8: 2412 anchor words
+topic 9: 2716 anchor words
+topic 10: 2576 anchor words
+topic 11: 2541 anchor words
 </pre>
 </div>
 </div>
@@ -14095,7 +14095,7 @@ topic 11: 2381 anchor words
 <span class="n">F</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">poisson2multinom</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k2</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;topic </span><span class="si">{i}</span><span class="s2">: </span><span class="si">{n_anchor}</span><span class="s2"> anchor words&quot;</span><span class="p">)</span>
     
 </pre></div>
@@ -14114,10 +14114,10 @@ topic 11: 2381 anchor words
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>topic 0: 61 anchor words
-topic 1: 23 anchor words
-topic 2: 40 anchor words
-topic 3: 265 anchor words
+<pre>topic 0: 1060 anchor words
+topic 1: 1162 anchor words
+topic 2: 634 anchor words
+topic 3: 1661 anchor words
 </pre>
 </div>
 </div>
@@ -14146,7 +14146,7 @@ topic 3: 265 anchor words
 <span class="n">F</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">poisson2multinom</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k2</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;topic </span><span class="si">{i}</span><span class="s2">: </span><span class="si">{n_anchor}</span><span class="s2"> anchor words&quot;</span><span class="p">)</span>
     
 </pre></div>
@@ -14165,13 +14165,13 @@ topic 3: 265 anchor words
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>topic 0: 139 anchor words
-topic 1: 339 anchor words
-topic 2: 33 anchor words
-topic 3: 7 anchor words
-topic 4: 77 anchor words
-topic 5: 0 anchor words
-topic 6: 7 anchor words
+<pre>topic 0: 750 anchor words
+topic 1: 1010 anchor words
+topic 2: 515 anchor words
+topic 3: 522 anchor words
+topic 4: 556 anchor words
+topic 5: 166 anchor words
+topic 6: 736 anchor words
 </pre>
 </div>
 </div>
@@ -14200,7 +14200,7 @@ topic 6: 7 anchor words
 <span class="n">F</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">poisson2multinom</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k2</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;topic </span><span class="si">{i}</span><span class="s2">: </span><span class="si">{n_anchor}</span><span class="s2"> anchor words&quot;</span><span class="p">)</span>
     
 </pre></div>
@@ -14219,18 +14219,18 @@ topic 6: 7 anchor words
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>topic 0: 53 anchor words
-topic 1: 5 anchor words
-topic 2: 224 anchor words
-topic 3: 0 anchor words
-topic 4: 3 anchor words
-topic 5: 0 anchor words
-topic 6: 18 anchor words
-topic 7: 7 anchor words
-topic 8: 27 anchor words
-topic 9: 5 anchor words
-topic 10: 15 anchor words
-topic 11: 20 anchor words
+<pre>topic 0: 353 anchor words
+topic 1: 182 anchor words
+topic 2: 620 anchor words
+topic 3: 86 anchor words
+topic 4: 573 anchor words
+topic 5: 40 anchor words
+topic 6: 260 anchor words
+topic 7: 415 anchor words
+topic 8: 172 anchor words
+topic 9: 262 anchor words
+topic 10: 299 anchor words
+topic 11: 173 anchor words
 </pre>
 </div>
 </div>
@@ -14266,7 +14266,7 @@ topic 11: 20 anchor words
 <span class="n">F</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">poisson2multinom</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k2</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;topic </span><span class="si">{i}</span><span class="s2">: </span><span class="si">{n_anchor}</span><span class="s2"> anchor words&quot;</span><span class="p">)</span>
     
 </pre></div>
@@ -14285,10 +14285,10 @@ topic 11: 20 anchor words
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>topic 0: 6 anchor words
-topic 1: 3 anchor words
-topic 2: 0 anchor words
-topic 3: 100 anchor words
+<pre>topic 0: 318 anchor words
+topic 1: 349 anchor words
+topic 2: 213 anchor words
+topic 3: 2637 anchor words
 </pre>
 </div>
 </div>
@@ -14304,7 +14304,7 @@ topic 3: 100 anchor words
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">dataname</span><span class="o">=</span><span class="s2">&quot;droplet&quot;</span>
 <span class="n">datadir</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;../../../gdrive/github_data/fastTopics-experiments-data/output/</span><span class="si">{dataname}</span><span class="s2">/rds&quot;</span>
-<span class="n">modelname</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;fit-</span><span class="si">{dataname}</span><span class="s2">-scd-ex-k=6.rds&quot;</span>
+<span class="n">modelname</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;fit-</span><span class="si">{dataname}</span><span class="s2">-scd-ex-k=8.rds&quot;</span>
 
 <span class="n">readRDS</span> <span class="o">=</span> <span class="n">robjects</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;readRDS&#39;</span><span class="p">]</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">readRDS</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{datadir}</span><span class="s2">/</span><span class="si">{modelname}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -14317,7 +14317,7 @@ topic 3: 100 anchor words
 <span class="n">F</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">poisson2multinom</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k2</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;topic </span><span class="si">{i}</span><span class="s2">: </span><span class="si">{n_anchor}</span><span class="s2"> anchor words&quot;</span><span class="p">)</span>
     
 </pre></div>
@@ -14336,12 +14336,14 @@ topic 3: 100 anchor words
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>topic 0: 3 anchor words
-topic 1: 0 anchor words
-topic 2: 98 anchor words
-topic 3: 11 anchor words
-topic 4: 0 anchor words
-topic 5: 5 anchor words
+<pre>topic 0: 195 anchor words
+topic 1: 182 anchor words
+topic 2: 95 anchor words
+topic 3: 141 anchor words
+topic 4: 289 anchor words
+topic 5: 148 anchor words
+topic 6: 1321 anchor words
+topic 7: 638 anchor words
 </pre>
 </div>
 </div>
@@ -14370,7 +14372,7 @@ topic 5: 5 anchor words
 <span class="n">F</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">poisson2multinom</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">n_anchor</span> <span class="o">=</span> <span class="n">find_anchor_word_k2</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;topic </span><span class="si">{i}</span><span class="s2">: </span><span class="si">{n_anchor}</span><span class="s2"> anchor words&quot;</span><span class="p">)</span>
     
 </pre></div>
@@ -14389,22 +14391,49 @@ topic 5: 5 anchor words
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>topic 0: 9 anchor words
-topic 1: 13 anchor words
-topic 2: 82 anchor words
-topic 3: 5 anchor words
-topic 4: 0 anchor words
-topic 5: 11 anchor words
-topic 6: 0 anchor words
-topic 7: 5 anchor words
-topic 8: 0 anchor words
-topic 9: 0 anchor words
-topic 10: 0 anchor words
-topic 11: 0 anchor words
+<pre>topic 0: 219 anchor words
+topic 1: 20 anchor words
+topic 2: 1163 anchor words
+topic 3: 134 anchor words
+topic 4: 73 anchor words
+topic 5: 34 anchor words
+topic 6: 93 anchor words
+topic 7: 530 anchor words
+topic 8: 116 anchor words
+topic 9: 112 anchor words
+topic 10: 88 anchor words
+topic 11: 211 anchor words
 </pre>
 </div>
 </div>
 
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># dataname=&quot;droplet&quot;</span>
+<span class="c1"># k = 8</span>
+<span class="c1"># datadir=f&quot;../../ebpmf_data_analysis/output/{dataname}&quot;</span>
+<span class="c1"># modelname=f&quot;fit_droplet_ebpmf_wbg2_k{k}_init_fastTopics.Rds&quot;</span>
+
+<span class="c1"># readRDS = robjects.r[&#39;readRDS&#39;]</span>
+<span class="c1"># data = readRDS(f&quot;{datadir}/{modelname}&quot;)</span>
+<span class="c1"># L = np.asarray(data.rx2(&#39;qg&#39;).rx2(&#39;qls_mean&#39;))</span>
+<span class="c1"># F = np.asarray(data.rx2(&#39;qg&#39;).rx2(&#39;qfs_mean&#39;))</span>
+
+<span class="c1"># del data</span>
+
+<span class="c1"># for i in range(F.shape[1]):</span>
+<span class="c1">#     n_anchor = find_anchor_word_k2(F, i, cutoff=5).sum()</span>
+<span class="c1">#     print(f&quot;topic {i}: {n_anchor} anchor words&quot;)</span>
+</pre></div>
+
+    </div>
 </div>
 </div>
 
