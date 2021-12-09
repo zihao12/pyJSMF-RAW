@@ -16,13 +16,15 @@ def poisson2multinom(F, L):
     return F, L
 
 
+
+
 def is_anchor_word(f, ind, cutoff):
     return (f[np.invert(ind)].max() == 0) and (f[ind] > cutoff)
     
 def find_anchor_word_k(F, k):
     F_ = F.copy()
     p, K = F_.shape
-    cutoff0 = (1/ p) / 1000
+    cutoff0 = (1/ p) / 100
     F_[F_ < cutoff0] = 0
     cutoff1 = (1/ p) / 10
     
@@ -30,6 +32,14 @@ def find_anchor_word_k(F, k):
     ind[k] = True
     
     return np.apply_along_axis(func1d = is_anchor_word, axis = 1, arr = F_, ind = ind, cutoff = cutoff1)
+
+def is_anchor_word2(f, k, cutoff):## cutoff is how many times larger than the rest
+    return f[k] > cutoff * (f.sum() - f[k])
+
+def find_anchor_word_k2(F, k, cutoff = 100):
+    F_ = F.copy()
+    
+    return np.apply_along_axis(func1d = is_anchor_word2, axis = 1, arr = F_, k = k, cutoff = cutoff)
 
 def read_fitted_rds(filename):
 	readRDS = robjects.r['readRDS']
@@ -57,7 +67,7 @@ def match_topics(F1, F2):
 
 
 ## visualize the extremal rows of matrix X (intended for when X is a lower dimension embedding)
-def vis_extremal_pca(X, S, which_dim = [0, 1], annotate=False,fontsize=6):
+def vis_extremal_pca(X, S, which_dim = [0, 1], annotate=False,fontsize=6, s= 30):
 	mask = np.zeros(X.shape[0])
 	mask[S] = 1
 	mask = mask.astype(bool)
@@ -69,7 +79,7 @@ def vis_extremal_pca(X, S, which_dim = [0, 1], annotate=False,fontsize=6):
 	            s = 3, c='b', marker="+", label='first')
 	ax1.scatter(X[mask,which_dim[0]], 
 	            X[mask, which_dim[1]], 
-	            s=30, c='r', marker="o", label='second')
+	            s=s, c='r', marker="o", label='second')
 	if annotate:
 		for s in S:
 			ax1.annotate(s, (X[s,which_dim[0]], X[s,which_dim[1]]), 
