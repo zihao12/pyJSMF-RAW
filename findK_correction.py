@@ -1,5 +1,5 @@
 import numpy as np
-
+import pdb
 
 def compute_C_unbiased_local(X):
     ## X is n by p
@@ -39,6 +39,34 @@ def Cbar_pj_rss(C, u, weights, const):
     out -= correction(C_, None, const)
     out -= correction(C_, u, const)
     
+    return out
+
+def est_utC_sq(C, d, u, X):
+    D = d*d - d
+    u2 = u**2
+    X2 = X**2
+    m = sum(D)
+    weights = C.sum(axis = 0)
+    #pdb.set_trace()
+    out = (C @ u) ** 2 
+    # out = out - ( (C @ u2) + 2 * (u *  (C @ u) - u2 * np.diag(C)) ) / m
+    out -= (u**2) * weights * d.sum() / (m**2)
+    out -=  ( C @ u2 + (C @ u) * u - 3 * u2 * np.diag(C) ) / m
+
+    # tmp = (X @ u)[:, None] - X * u[None, :]
+    # tmp = (X * tmp)**2
+    # tmp -= X2 * ((X2 @ u2)[:, None] - X2 * u2[None, :])
+    tmp = ((X @ u)**2 - X2 @ u2)[:, None] - 2* (X @ u)[:, None] * (X * u[None, :]) + 2* X2 * u2[None, :]
+    tmp = X2 * tmp
+
+    tmp = tmp / (d**3)[:, None]
+    tmp = tmp.mean(axis = 0)
+    tmp = tmp * (d**3).sum()
+    tmp = tmp / (m**2)
+    out = out - tmp
+
+    out /= (1 - np.sum((D / m)**2))
+
     return out
 
 
