@@ -47,17 +47,20 @@ def est_utC_sq(C, d, u, X):
     X2 = X**2
     m = sum(D)
     weights = C.sum(axis = 0)
-    #pdb.set_trace()
     out = (C @ u) ** 2 
-    # out = out - ( (C @ u2) + 2 * (u *  (C @ u) - u2 * np.diag(C)) ) / m
-    out -= (u**2) * weights * d.sum() / (m**2)
-    out -=  ( C @ u2 + (C @ u) * u - 3 * u2 * np.diag(C) ) / m
 
-    # tmp = (X @ u)[:, None] - X * u[None, :]
-    # tmp = (X * tmp)**2
-    # tmp -= X2 * ((X2 @ u2)[:, None] - X2 * u2[None, :])
+    ## original code ###################
+    out -= (u**2) * weights * d.sum() / (m**2)
+    out -=  ( C @ u2 + 2 * (C @ u) * u - 3 * u2 * np.diag(C) ) / m
+    #pdb.set_trace()
     tmp = ((X @ u)**2 - X2 @ u2)[:, None] - 2* (X @ u)[:, None] * (X * u[None, :]) + 2* X2 * u2[None, :]
     tmp = X2 * tmp
+    ## original code ###################
+
+    # ## new code #####
+    # tmp = X2 * ((X @ u)**2)[:, None]
+    # ## new code #####
+
 
     tmp = tmp / (d**3)[:, None]
     tmp = tmp.mean(axis = 0)
@@ -65,7 +68,7 @@ def est_utC_sq(C, d, u, X):
     tmp = tmp / (m**2)
     out = out - tmp
 
-    out /= (1 - np.sum((D / m)**2))
+    out /= (1 - np.sum(D**2) / m**2) ## changes very little
 
     return out
 
