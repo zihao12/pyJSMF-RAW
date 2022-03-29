@@ -8,67 +8,72 @@ def findS_correction_jk(X, Cbar, C, K):
 		D = d * (d - 1)
 		w = X.sum(axis = 0)
 		w /= w.sum()
+		W = compute_W(X, w, d)
 
 		Res = Cbar.T
 		S = np.zeros(K)
 		diagR = np.zeros(K)
 
-		theta, Theta = JK_step1(X, C, D)
+		theta, Theta = JK_step1(X, W, w, C, Cbar, D)
 		g = theta
 		G = Theta
 		v = v_jk(G)
-		gbar = shrink(g / np.power(w, 2), v / np.power(w, 4))
+		g_ = shrink(g , v)
 
 		for k in range(K):
-				maxSquaredSum = np.max(gbar)
-				maxCol = np.argmax(gbar)
+				maxSquaredSum = np.max(g_)
+				maxCol = np.argmax(g_)
 				S[k] = maxCol
 				u = Res[:, maxCol].copy()
 				u = u / np.sqrt(np.power(u, 2).sum()) ## u / np.sqrt(maxSquaredSum)? Could be better
 				diagR[k] = np.sqrt(maxSquaredSum) ## np.sqrt(np.power(u, 2).sum())?
 				
-				theta, Theta = JK_stepk(X, u, C, D)
+				theta, Theta = JK_stepk(X, W, w, u, C, Cbar, D)
 				g -= theta
 				G -= Theta
 				v = v_jk(G)
-				gbar = shrink(g / np.power(w, 2), v / np.power(w, 4))
+				g_ = shrink(g , v)
 
 				Res = Res -  u[:, None] @ (u[:,None].T @ Res)
 
 		return S, diagR
 
-def JK_step1(X, C, D): 
-		n, p = X.shape
-		theta = (C**2).sum(axis = 1) 
-		X2 = np.power(X, 2)
-		b = (X2.sum(axis = 1)[:, None] * X2).sum(axis = 0) +  X2.sum(axis = 0) - 2 * np.power(X, 3).sum(axis = 0)
-		b /= ((n - 1) * n * D**2)
-		theta = (1 + 1/(n-1)) * theta - b
+def compute_W(X, w, d):
+		n = X.shape[0]
+		out = (n-1) * d  * w[None, :] / (X.sum(axis = 0)[None, :] - X)
 
-		## compute S, v; 
+		return out
+
+def JK_step1(X, W, w, C, Cbar, D): 
+		n, p = X.shape
+		X2 = np.power(X, 2)
 		Theta = X2 * (1 + X2.sum(axis = 1)[:, None] - 2 * X) / np.power(D, 2)
 		Theta -= 2* (n/D) * X * (X @ C - np.diag(C)[None, :])
 		Theta /= -(n - 1) 
+		Theta *= np.power(W, 2)
+		Theta /= np.power(w, 2)[None, :] 
+		Tn = (Cbar**2).sum(axis = 1) 
+		Theta += n * (1 - (n / (n-1)) * np.power(W, 2)) * Tn[None, :]
 		
-		return theta, Theta
+		return Theta.mean(axis = 0), Theta
 
 		
 
-def JK_stepk(X, u, C, D):
+def JK_stepk(X, W, w, u, C, Cbar, D):
 		n = X.shape[0]
-		utC = (u[:, None].T @ C)[0,:]
 		A = X * (X @ u)[:, None] - X * u[None, :]
 		A /= D
-
-		theta = np.power(utC, 2)
-		theta = (1 + 1/(n-1)) * theta - np.power(A, 2).sum(axis = 0) / (n-1) / n
-
+		utCbar = Cbar @ u
+		utC = C @ u
 		Theta = np.power(A, 2)
-		#pdb.set_trace()
 		Theta -= 2 * n * A * utC[None, :]
 		Theta /= -(n-1)
-
-		return theta, Theta
+		Theta *= np.power(W, 2)
+		Theta /= np.power(w, 2)[None, :] ## CHECK
+		Tn = utCbar**2
+		Theta += n * (1 - (n / (n-1)) * np.power(W, 2)) * Tn[None, :]
+		
+		return Theta.mean(axis = 0), Theta
 
 
 def v_jk(G):
@@ -90,12 +95,16 @@ def exper_jk(X, Cbar, C, U):
 		n, p = X.shape
 		d = X.sum() / n
 		D = d * (d - 1)
+		w = X.sum(axis = 0)
+		w /= w.sum()
+		W = compute_W(X, w, d)
+
 		gs = np.zeros((p, K))
 		vs = np.zeros((p, K))
 
 		Res = Cbar.T
 		
-		theta, Theta = JK_step1(X, C, D)
+		theta, Theta = JK_step1(X, W, w, C, Cbar, D)
 		g = theta
 		G = Theta
 		v = v_jk(G)
@@ -105,7 +114,7 @@ def exper_jk(X, Cbar, C, U):
 				vs[:, k] = v
 				u = U[:, k].copy()
 				#pdb.set_trace()
-				theta, Theta = JK_stepk(X, u, C, D)
+				theta, Theta = JK_stepk(X, W, w, u, C, Cbar, D)
 				g -= theta
 				G -= Theta
 				v = v_jk(G)
