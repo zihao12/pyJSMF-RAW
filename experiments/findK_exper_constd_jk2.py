@@ -67,6 +67,7 @@ truth = (Cbar**2).sum(axis = 1)
 w_true = C.sum(axis = 1)
 ## input: L, F, s, idx
 n_sample = 50
+est_notcorrected = np.zeros((p, k, n_sample))
 est = np.zeros((p, k, n_sample))
 se = np.zeros((p, k, n_sample))
 
@@ -82,12 +83,13 @@ for i in range(n_sample):
     # pdb.set_trace()
     C_ = compute_C_unbiased(X)
     Cbar_ = C_ / C_.sum(axis = 1)[:, None]
-    gs, vs = exper_jk(X, Cbar_, C_, U)
+    gs, vs, gs_notcorrected = exper_jk(X, Cbar_, C_, U)
     #pdb.set_trace()
     est[:, :, i] = gs 
     se[:, :, i] = np.sqrt(vs)
+    est_notcorrected [:, :, i] = gs_notcorrected
  
 outputfile="findK-exper-constd-jk2.pkl"
 with open(outputfile, "wb") as f:
-    pickle.dump({'est':est,
+    pickle.dump({'est':est, 'est_notcorrected':est_notcorrected,
         'se':se, 'C':C, 'truth': truth}, f)
