@@ -1,8 +1,14 @@
 ## implement corrected findK with jackknife
 import numpy as np
+import rpy2
+import rpy2.interactive as r
+import rpy2.interactive.packages
+from rpy2.robjects import numpy2ri
 import pdb
+ebnm = r.packages.importr("ebnm")
 
-def findS_correction_jk(X, Cbar, C, K):
+
+def findS_correction_jk(X, Cbar, C, K, prior_family = "point_normal"):
 		n, p = X.shape
 		d = X.sum() / n
 		D = d * (d - 1)
@@ -18,7 +24,7 @@ def findS_correction_jk(X, Cbar, C, K):
 		g = theta
 		G = Theta
 		v = v_jk(G)
-		g_ = shrink(g , v)
+		g_ = shrink(g , v, prior_family)
 
 		for k in range(K):
 				maxSquaredSum = np.max(g_)
@@ -32,7 +38,7 @@ def findS_correction_jk(X, Cbar, C, K):
 				g -= theta
 				G -= Theta
 				v = v_jk(G)
-				g_ = shrink(g , v)
+				g_ = shrink(g , v, prior_family)
 
 				Res = Res -  u[:, None] @ (u[:,None].T @ Res)
 
@@ -83,14 +89,23 @@ def v_jk(G):
 	return out
 
  
-def shrink(g, v):
+def shrink(g, v, prior_family = "point_normal"):
+		s = np.sqrt(v).copy()
+		x = g.copy()
 		## careful not to alter g
-		
-		return g
+		numpy2ri.activate()
+		fit = ebnm.ebnm(x = x, s= s, prior_family = prior_family, mode = "estimate")
+		g_ = np.asarray(fit.rx2('posterior'))
+		numpy2ri.deactivate()
+
+		g_ = g_.view((float, len(g_.dtype.names)))[:, 0]
+		#pdb.set_trace()
+
+		return g_ 
 
 ## functions for experiments
 
-def exper_jk(X, Cbar, C, U):
+def exper_jk(X, Cbar, C, U, prior_family = "point_normal"):
 		K = U.shape[1]
 		n, p = X.shape
 		d = X.sum() / n
@@ -99,27 +114,66 @@ def exper_jk(X, Cbar, C, U):
 		w /= w.sum()
 		W = compute_W(X, w, d)
 
+		gs_notcorrected = np.zeros((p, K))
 		gs = np.zeros((p, K))
 		vs = np.zeros((p, K))
 
 		Res = Cbar.T
 		
 		theta, Theta = JK_step1(X, W, w, C, Cbar, D)
+		g0 = (Cbar**2).sum(axis = 1)
 		g = theta
 		G = Theta
 		v = v_jk(G)
 
 		for k in range(K):
+				gs_notcorrected[:, k] = g0
 				gs[:, k] = g
 				vs[:, k] = v
 				u = U[:, k].copy()
 				#pdb.set_trace()
+
+				g0 -= (Cbar @ u)**2
 				theta, Theta = JK_stepk(X, W, w, u, C, Cbar, D)
 				g -= theta
 				G -= Theta
 				v = v_jk(G)
 				
-		return gs, vs
+		return gs, vs, gs_notcorrected
+
+# def exper_jk_shrinkage(X, Cbar, C, U): ## sth wrong here
+# 		K = U.shape[1]
+# 		n, p = X.shape
+# 		d = X.sum() / n
+# 		D = d * (d - 1)
+# 		w = X.sum(axis = 0)
+# 		w /= w.sum()
+# 		W = compute_W(X, w, d)
+
+# 		gs = np.zeros((p, K))
+# 		gs_shrink = np.zeros((p, K))
+
+# 		Res = Cbar.T
+		
+# 		theta, Theta = JK_step1(X, W, w, C, Cbar, D)
+# 		g = theta
+# 		G = Theta
+# 		v = v_jk(G)
+# 		g_ = shrink(g , v)
+
+# 		for k in range(K):
+# 				gs[:, k] = g
+# 				gs_shrink[:, k] = g_
+# 				u = U[:, k].copy()
+# 				#pdb.set_trace()
+# 				theta, Theta = JK_stepk(X, W, w, u, C, Cbar, D)
+# 				g -= theta
+# 				G -= Theta
+# 				v = v_jk(G)
+# 				g_ = shrink(g , v)
+				
+# 		return gs, gs_shrink
+
 
 def get_U(Cbar, K):
 		p = Cbar.shape[0]
