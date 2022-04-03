@@ -18,7 +18,7 @@ script_dir = "../"
 sys.path.append(os.path.abspath(script_dir))
 from file2 import *
 from factorize import *
-from smallsim_functions import simulate_multinomial_counts
+#from smallsim_functions import simulate_multinomial_counts
 from misc import *
 from findK_correction_jk import *
 
@@ -52,7 +52,10 @@ fitted = data.rx2('fit_sub')
 F = np.asarray(fitted.rx2('F'))
 L = np.asarray(fitted.rx2('L'))
 s = np.asarray(fitted.rx2('s'))
-s = np.repeat(np.round(s.mean()), s.shape[0]) ## equal length
+
+## double number of documents
+L = np.concatenate([L, L])
+s = np.concatenate([s, s]) 
 
 p, k = F.shape
 n = L.shape[0]
@@ -74,7 +77,8 @@ se = np.zeros((p, k, n_sample))
 
 for i in range(n_sample):
     print(i)
-    X = simulate_multinomial_counts_local(L, F, np.round(s))
+    s_ = np.random.poisson(lam = s.mean(), size = s.shape)
+    X = simulate_multinomial_counts_local(L, F, np.round(s_))
     if X.sum(axis = 0).min() < 1:
         pass
     # w = X.sum(axis = 0)
@@ -89,7 +93,7 @@ for i in range(n_sample):
     se[:, :, i] = np.sqrt(vs)
     est_notcorrected [:, :, i] = gs_notcorrected
  
-outputfile="findK-exper-constd-jk2.pkl"
+outputfile="findK-exper-jk2-bigger.pkl"
 with open(outputfile, "wb") as f:
     pickle.dump({'est':est, 'est_notcorrected':est_notcorrected,
         'se':se, 'C':C, 'truth': truth}, f)

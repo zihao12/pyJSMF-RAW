@@ -20,7 +20,7 @@ from file2 import *
 from factorize import *
 from smallsim_functions import simulate_multinomial_counts
 from misc import *
-from findK_correction_constd_jk2 import *
+from findK_correction_jk import *
 
 import pdb
 
