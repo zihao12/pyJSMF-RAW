@@ -1,5 +1,6 @@
 ## implement corrected findK with jackknife
 import numpy as np
+import scipy
 import rpy2
 import rpy2.interactive as r
 import rpy2.interactive.packages
@@ -50,7 +51,7 @@ def compute_W(X, w, d):
 
 		## no need for w here
 		s = X.sum(axis = 0)
-		out = s[None, :] / (s[None, :] - X)
+		out = s[None, :] / (s[None, :] - X) ## divide by 0??	
 		out *= ( 1 - d / s.sum())[:, None]
 
 
@@ -98,9 +99,12 @@ def v_jk(G):
 def shrink(g, v, prior_family = "point_normal"):
 		s = np.sqrt(v).copy()
 		x = g.copy()
+		
 		## careful not to alter g
 		numpy2ri.activate()
 		fit = ebnm.ebnm(x = x, s= s, prior_family = prior_family, mode = "estimate")
+		# mode = scipy.stats.mode(g)[0][0]
+		# fit = ebnm.ebnm(x = x, s= s, prior_family = prior_family, mode = mode)
 		g_ = np.asarray(fit.rx2('posterior'))
 		numpy2ri.deactivate()
 
