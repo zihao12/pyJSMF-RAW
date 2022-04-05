@@ -4,7 +4,7 @@ import scipy
 import rpy2
 import rpy2.interactive as r
 import rpy2.interactive.packages
-from rpy2.robjects import numpy2ri
+from rpy2.robjects import numpy2ri, vectors
 import pdb
 ebnm = r.packages.importr("ebnm")
 
@@ -96,20 +96,28 @@ def v_jk(G):
 	return out
 
  
+# def shrink(g, v, prior_family = "point_normal"):
+# 		s = np.sqrt(v).copy()
+# 		x = g.copy()
+		
+# 		## careful not to alter g
+# 		numpy2ri.activate()
+# 		fit = ebnm.ebnm(x = x, s= s, prior_family = prior_family, mode = "estimate")
+# 		# mode = scipy.stats.mode(g)[0][0]
+# 		# fit = ebnm.ebnm(x = x, s= s, prior_family = prior_family, mode = mode)
+# 		g_ = np.asarray(fit.rx2('posterior'))
+# 		numpy2ri.deactivate()
+
+# 		g_ = g_.view((float, len(g_.dtype.names)))[:, 0]
+# 		#pdb.set_trace()
+
+# 		return g_ 
+
 def shrink(g, v, prior_family = "point_normal"):
 		s = np.sqrt(v).copy()
 		x = g.copy()
-		
-		## careful not to alter g
-		numpy2ri.activate()
-		fit = ebnm.ebnm(x = x, s= s, prior_family = prior_family, mode = "estimate")
-		# mode = scipy.stats.mode(g)[0][0]
-		# fit = ebnm.ebnm(x = x, s= s, prior_family = prior_family, mode = mode)
-		g_ = np.asarray(fit.rx2('posterior'))
-		numpy2ri.deactivate()
-
-		g_ = g_.view((float, len(g_.dtype.names)))[:, 0]
-		#pdb.set_trace()
+		fit = ebnm.ebnm(x = vectors.FloatVector(x), s= vectors.FloatVector(s), prior_family = prior_family, mode = "estimate")
+		g_ = np.asarray(fit.rx2('posterior'))[0, :]
 
 		return g_ 
 
