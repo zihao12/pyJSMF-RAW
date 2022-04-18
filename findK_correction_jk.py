@@ -43,7 +43,7 @@ def findS_correction_jk(X, Cbar, C, K, prior_family = "point_normal"):
 
 				Res = Res -  u[:, None] @ (u[:,None].T @ Res)
 
-		return S, diagR
+		return S.astype(int), diagR
 
 def compute_W(X, w, d):
 		# n = X.shape[0]
