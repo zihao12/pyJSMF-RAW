@@ -146,9 +146,9 @@ def bows2H(bows, min_tokens=5):
 #   - D2: N-by-N co-example frequency matrix
 #   - dictionary: the original/curated dictonary of vocabulary
 #
-def createC(bows_filename, dict_filename='', stop_filename='', N=0, min_objects=3, min_tokens=5, output_filename=''):
+def createC(bows_filename, dict_filename='', stop_filename='', N=0, min_objects=3, min_tokens=5, min_doc = 2, output_filename=''):
 
-	bows, dictionary = readBows(bows_filename, dict_filename, stop_filename, N, min_objects, output_filename)
+	bows, dictionary = readBows(bows_filename, dict_filename, stop_filename, N, min_objects, min_doc, output_filename)
 	C, D1, D2 = bows2C(bows, min_tokens)
 
 	return C, D1, D2, dictionary
@@ -188,7 +188,7 @@ def createC(bows_filename, dict_filename='', stop_filename='', N=0, min_objects=
 #     - Fourth, reorders the object numbers by assigning consecutive integers starting from 1.
 #     - Last, it trims the dictionary according to the vocabulary size N.
 #  
-def readBows(bows_filename, dict_filename, stop_filename, N, min_objects, output_filename):
+def readBows(bows_filename, dict_filename, stop_filename, N, min_objects, min_doc, output_filename):
 
 	# Print out initial status
 	print('[file.readBows] Start reading Bag-of-words dataset...')
@@ -265,6 +265,8 @@ def readBows(bows_filename, dict_filename, stop_filename, N, min_objects, output
 		dfs[objects-1] += 1
 
 
+
+
 	# Note that we at least prune all the object which shows up more than 50% of the documents
 	# This is our document-frequency cut-off to be included in the effective vocabulary
 	# Option 1: Integer flooring on df scores.
@@ -281,14 +283,23 @@ def readBows(bows_filename, dict_filename, stop_filename, N, min_objects, output
 	# objet number. Some numbers could be unused, making tf-idf as 0/0.
 	nanIndices = np.isnan(tfIdfs)
 	tfIdfs[nanIndices] = 0
+
+	# pdb.set_trace()
+	# min_doc = 2
+	rareIndices = (dfs < min_doc)
+	tfIdfs[rareIndices] = 0
+
 	indices = tfIdfs.argsort()[::-1]
-	N = min(N, V - sum(nanIndices))
+	N = min(N, V - sum(nanIndices) - sum(rareIndices))
 
 	# Discard every bag-of-word entries with an irrelevant object.
 	# Note that actual number of objects = V - non-existing objects
 	irrelevantObjects = indices[N:]
 	irrelevantIndices = [idx for idx in range(len(bows)) if bows[idx,1]-1 in irrelevantObjects]
 	bows = np.delete(bows, irrelevantIndices, axis=0)
+
+
+	
 
 	# Step 3: Remove training examples having less than the minimum number of objects.
 	# Recalculate the indices where each new training example starts.
