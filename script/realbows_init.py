@@ -83,7 +83,7 @@ if method == "random":
 W, H, _ = non_negative_factorization(X, n_components=k, init='custom', random_state=0,
                                           update_H=False, H=F.T,
                                           beta_loss='kullback-leibler', solver='mu',
-                                          max_iter = 100, verbose = True)
+                                          max_iter = 100, tol=1e-30, verbose = True)
 
 loss = _beta_divergence(X, W, H, 1, square_root=True)
 out = {'W': W, 'H': H, 'loss':loss, 'S': S}
