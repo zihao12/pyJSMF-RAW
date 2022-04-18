@@ -20,16 +20,17 @@ np.random.seed(123)
 # C, D1, D2, dictionary = createC("../dataset/real_bows/docword.nips.txt", "../dataset/real_bows/vocab.nips.txt", "../dataset/real_bows/standard.stops", N=5000, min_objects=3, min_tokens=5, output_filename="example")
 
 dir_name="../dataset/real_bows"
-data_name="nips"
-vocab_size = 5000
+#data_name="nips"
+#vocab_size = 5000
+#min_objects=10
+#min_tokens=10
+#min_doc=2
+
+data_name="nytimes"
+vocab_size = 15000
 min_objects=10
 min_tokens=10
 min_doc=2
-
-# data_name="nytimes"
-# vocab_size = 15000
-# min_objects=3
-# min_tokens=5
 
 docword_file=f"{dir_name}/docword.{data_name}.txt"
 vocab_file=f"{dir_name}/vocab.{data_name}.txt"
