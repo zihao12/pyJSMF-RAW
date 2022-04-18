@@ -21,9 +21,10 @@ np.random.seed(123)
 
 dir_name="../dataset/real_bows"
 data_name="nips"
-vocab_size = 4000
+vocab_size = 5000
 min_objects=10
 min_tokens=10
+min_doc=2
 
 # data_name="nytimes"
 # vocab_size = 15000
@@ -36,26 +37,11 @@ stop_file=f"{dir_name}/standard.stops"
 
 
 bows, dictionary = readBows(docword_file, vocab_file, stop_file, 
-	N=vocab_size, min_objects=min_objects, output_filename="")
-
-#pdb.set_trace()
-
-# ## remove words that only appear in one document
-# p = dictionary.shape[0]
-# idx = []
-# w_idx = []
-# for w in range(p):
-# 		if (bows[:, 1]-1 == w).sum() < 2:
-# 				idx += [np.where(bows[:, 1]-1 == w)[0][0]]
-# 				w_idx += [w]
-# bows = np.delete(bows, np.array(idx), axis = 0)
-# dictionary = np.delete(dictionary, np.array(w_idx))
-
+	N=vocab_size, min_objects=min_objects, min_doc=min_doc, output_filename="")
 
 ## get X and C
 X, _, _ = bows2H(bows, min_tokens=min_tokens)
-
-print((X > 0).sum(axis = 0).min())
+print((X > 0).sum(axis = 1).min())
 
 C, _, _ = bows2C(bows, min_tokens=min_tokens)
 
