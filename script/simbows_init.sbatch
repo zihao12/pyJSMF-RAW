@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#SBATCH --partition=broadwl
+#SBATCH --ntasks-per-node=8
+#SBATCH --mem=16G
+#SBATCH --time=36:00:00
+
+module load R/3.6.1
+
+export PATH="/home/wangzh/miniconda3/bin:$PATH"
+
+DAT=${1}
+METHOD=${2}
+K=${3}
+OUTFILE=${4}
+
+echo dat=${DAT}
+echo method=${METHOD}
+echo k=${K}
+echo outfile=${OUTFILE}
+
+
+python3 -u simbows_init.py ${DAT} ${METHOD} ${K} > ${OUTFILE} 
