@@ -8,15 +8,24 @@ from mpl_toolkits import mplot3d
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 def poisson2multinom(F, L):
-    u = F.sum(axis = 0)
-    F /= u
-    L *= u
-    L /= L.sum(axis = 1)[:, None]
+		F_ = F.copy()
+		L_ = L.copy()
+		u = F_.sum(axis = 0)
+		F_ /= u
+		L_ *= u
+		L_ /= L_.sum(axis = 1)[:, None]
+
+		return F_, L_
     
-    return F, L
+def simulate_multinomial_counts(L, F, s):
+    n = L.shape[0]
+    p = F.shape[0]
+    Prob = L.dot(F.T)
+    X = np.empty(shape = (n, p))
+    for i in range(n):
+        X[i,] = np.random.multinomial(s[i], Prob[i,], size = 1).astype(int)
 
-
-
+    return X
 
 def is_anchor_word(f, ind, cutoff):
     return (f[np.invert(ind)].max() == 0) and (f[ind] > cutoff)
@@ -80,6 +89,8 @@ def vis_extremal_pca(X, S, which_dim = [0, 1], annotate=False,fontsize=6, s= 30)
 	ax1.scatter(X[mask,which_dim[0]], 
 	            X[mask, which_dim[1]], 
 	            s=s, c='r', marker="o", label='second')
+	ax1.set_xlabel(f'PC {which_dim[0]}')
+	ax1.set_ylabel(f'PC {which_dim[1]}')
 	if annotate:
 		for s in S:
 			ax1.annotate(s, (X[s,which_dim[0]], X[s,which_dim[1]]), 
@@ -200,3 +211,32 @@ def beta_mean_var(a, b):
     var = a*b/((a + b + 1) * (a+b)**2)
     
     return mu, var
+
+def compute_C(Pi):
+    N = Pi.shape[0]
+    C = Pi.T @ Pi / N
+    C_Var = ((Pi**2).T @ (Pi**2) - N * C**2) / (N * (N - 1))
+    
+    return C, C_Var
+
+def compute_Cbar(C, C_Var):
+    Cbar = C / C.sum(axis = 1)[:, None]
+    Cbar_Var = C_Var / (C.sum(axis = 1)**2)[:, None]
+    
+    return Cbar, Cbar_Var
+
+def compute_C_unbiased(X):
+	## X is n by p
+	n,  p = X.shape
+	d = X.sum(axis = 1)
+	d = d * (d -1)
+	Y = X.T @ np.diag(np.sqrt(1/d))
+	C = (Y @ Y.T) / n
+	C -= np.diag((X.T @ np.diag(1/d)).mean(axis = 1)) ## can improve
+
+	return C
+
+
+
+
+
