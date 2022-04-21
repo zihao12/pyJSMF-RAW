@@ -48,4 +48,44 @@ for(dataname in c("sla", "nips", "kos")){
   simbows_ll_val[[dataname]] = data.frame(k = ks, which_best = which_best_val)
 }
 
-saveRDS(list(realbows_ll = realbows_ll,simbows_ll = simbows_ll, simbows_ll_val = simbows_ll_val), "bows_summary.Rds")
+
+bows_summary = list(realbows_ll = realbows_ll,simbows_ll = simbows_ll, simbows_ll_val = simbows_ll_val)
+out = list()
+
+tmp = bows_summary$realbows_ll
+df = data.frame(matrix(ncol = 2, nrow = 0))
+colnames(df) <- c("k", "which_best")
+dn_ = c()
+for(d in names(tmp)){
+  dn_ = c(dn_, replicate(nrow(tmp[[d]]), d))
+  df = rbind(df, tmp[[d]])
+}
+df = cbind(dn_, df)
+colnames(df) <- c("data", "k", "which_best")
+out[["realbows_ll"]] = df
+
+tmp = bows_summary$simbows_ll
+df = data.frame(matrix(ncol = 2, nrow = 0))
+colnames(df) <- c("k", "which_best")
+dn_ = c()
+for(d in names(tmp)){
+  dn_ = c(dn_, replicate(nrow(tmp[[d]]), d))
+  df = rbind(df, tmp[[d]])
+}
+df = cbind(dn_, df)
+colnames(df) <- c("data", "k", "which_best")
+out[["simbows_ll"]] = df
+
+tmp = bows_summary$simbows_ll_val
+df = data.frame(matrix(ncol = 2, nrow = 0))
+colnames(df) <- c("k", "which_best")
+dn_ = c()
+for(d in names(tmp)){
+  dn_ = c(dn_, replicate(nrow(tmp[[d]]), d))
+  df = rbind(df, tmp[[d]])
+}
+df = cbind(dn_, df)
+colnames(df) <- c("data", "k", "which_best")
+out[["simbows_ll_val"]] = df
+
+saveRDS(out, "bows_summary.Rds")
