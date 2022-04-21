@@ -1,0 +1,64 @@
+---
+title: "bows_summary"
+author: "Zihao Wang"
+date: "4/20/2022"
+output: html_document
+---
+
+## Methods
+
+## Real data
+Datasets are small-sized
+```{r}
+rm(list = ls())
+bows_summary = readRDS("bows_summary.Rds")
+realbows_scd = read.csv("realbows_scd.csv")
+simbows_scd = read.csv("simbows_scd.csv")
+simbows_scd_val = read.csv("simbows_scd_val.csv")
+
+```
+
+### Loglikelihood comparison
+```{r}
+bows_summary$realbows_ll
+```
+
+### Loglikelihood in scd steps
+```{r}
+colors = c("black", "blue3", "darkorchid3", "darkorange4", "red", "yellow", "cyan3")
+dn = "sla"
+k = 15 ##note here rec and vanilla gives the same result
+# mn = unique(realbows_scd$method)
+# mn = mn[mn != "random"]
+# Loglik = realbows_scd[realbows_scd$k == k & realbows_scd$data == dn & realbows_scd$method != "random", ]
+
+
+mn = unique(simbows_scd_val$method)
+mn = mn[mn != "random"]
+Loglik = simbows_scd_val[simbows_scd_val$k == k & simbows_scd_val$data == dn & simbows_scd_val$method != "random", ]
+
+
+opt = max(Loglik[, 4:ncol(Loglik)])
+idx = 1:20
+i = 1
+ylim = c(min(opt - Loglik[,3 + idx]), max(opt - Loglik[,3 + idx]))
+plot(idx, opt - Loglik[Loglik$method == mn[i], 3+idx], col = colors[i], type = "l", ylim = ylim)
+for(i in 2:length(mn)){
+  lines(idx, opt - Loglik[Loglik$method == mn[i], 3+idx], col = colors[i], ylim = ylim)
+}
+legend("topright",legend = mn,cex=.8,col=colors, lwd = 2)
+Loglik[, 1:4]
+```
+
+
+
+```{r}
+bows_summary$simbows_ll_val
+```
+
+
+
+
+
+
+
