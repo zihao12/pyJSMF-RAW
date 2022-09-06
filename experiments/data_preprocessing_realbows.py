@@ -4,6 +4,7 @@ import sys
 
 import numpy as np
 from scipy import sparse, io
+import pickle
 
 # import pickle
 # from sklearn.decomposition import NMF, non_negative_factorization
@@ -22,12 +23,12 @@ np.random.seed(123)
 dir_name="../dataset/real_bows"
 #data_name="nips"
 #vocab_size = 5000
-# data_name="nytimes"
-# vocab_size = 15000
+data_name="nytimes"
+vocab_size = 15000
 #data_name="kos"
 #vocab_size = 2000
-data_name="sla"
-vocab_size = 2000
+# data_name="sla"
+# vocab_size = 2000
 
 
 min_objects=10
